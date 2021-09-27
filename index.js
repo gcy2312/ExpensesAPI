@@ -3,7 +3,11 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const uuid = require('uuid');
 const mongoose = require('mongoose');
+
 const Models = require('./models.js');
+require('./passport');
+
+const generateAuth = require('./auth');
 
 const Bills = Models.Bill;
 const Expenses = Models.Expense;
@@ -16,9 +20,12 @@ app.use(morgan('common'));
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-let auth = require('./auth')(app);
+
+generateAuth(app);
 const passport = require('passport');
-require('./passport');
+
+
+
 
 
 //documentation request
