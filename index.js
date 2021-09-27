@@ -16,6 +16,9 @@ app.use(morgan('common'));
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+let auth = require('./auth')(app);
+const passport = require('passport');
+require('./passport');
 
 
 //documentation request
@@ -29,7 +32,7 @@ app.get('/', (req, res) => {
 });
 
 //get user by userId
-app.get('/users/:id', (req, res) => {
+app.get('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   // Users.find({ _id: req.params.userId })
   Users.findById(req.params.id)
     .then((user) => {
@@ -42,7 +45,7 @@ app.get('/users/:id', (req, res) => {
 });
 
 //get users list of expenses
-app.get('/users/:id/expenses', (req, res) => {
+app.get('/users/:id/expenses', passport.authenticate('jwt', { session: false }), (req, res) => {
   Expenses.find({ UserId: req.params.id })
     .then((userExpenses) => {
       res.json(userExpenses);
@@ -54,7 +57,7 @@ app.get('/users/:id/expenses', (req, res) => {
 });
 
 //get users list of bills
-app.get('/users/:id/bills', (req, res) => {
+app.get('/users/:id/bills', passport.authenticate('jwt', { session: false }), (req, res) => {
   Bills.find({ UserId: req.params.id })
     .then((bills) => {
       res.json(bills);
@@ -66,7 +69,7 @@ app.get('/users/:id/bills', (req, res) => {
 });
 
 //get single expense info
-app.get('/expenses/:expenseId', (req, res) => {
+app.get('/expenses/:expenseId', passport.authenticate('jwt', { session: false }), (req, res) => {
   Expenses.find({ _id: req.params.expenseId })
     .then((expense) => {
       res.json(expense);
@@ -78,7 +81,7 @@ app.get('/expenses/:expenseId', (req, res) => {
 });
 
 //get single bill info
-app.get('/bills/:billId', (req, res) => {
+app.get('/bills/:billId', passport.authenticate('jwt', { session: false }), (req, res) => {
   Bills.find({ _id: req.params.billId })
     .then((bill) => {
       res.json(bill);
@@ -121,7 +124,7 @@ app.post('/users', (req, res) => {
 });
 
 //create new expense doc
-app.post('/users/:id/expenses', (req, res) => {
+app.post('/users/:id/expenses', passport.authenticate('jwt', { session: false }), (req, res) => {
   Expenses.create({
     ...req.body, UserId: req.params.id, Index: true
   })
@@ -137,7 +140,7 @@ app.post('/users/:id/expenses', (req, res) => {
 });
 
 //create new bill doc
-app.post('/users/:id/bills', (req, res) => {
+app.post('/users/:id/bills', passport.authenticate('jwt', { session: false }), (req, res) => {
   Bills.create({
     ...req.body, UserId: req.params.id, Index: true
   })
@@ -155,7 +158,7 @@ app.post('/users/:id/bills', (req, res) => {
 //PUT requests (update)
 
 //update user by id
-app.put('/users/:id', (req, res) => {
+app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findByIdAndUpdate(req.params.id, {
     $set:
     {
@@ -179,7 +182,7 @@ app.put('/users/:id', (req, res) => {
 });
 
 //update single expense doc
-app.put('/users/:id/expenses/:expenseId', (req, res) => {
+app.put('/users/:id/expenses/:expenseId', passport.authenticate('jwt', { session: false }), (req, res) => {
   Expenses.findByIdAndUpdate({ _id: req.params.expenseId }, {
     $set:
     {
@@ -204,7 +207,7 @@ app.put('/users/:id/expenses/:expenseId', (req, res) => {
 });
 
 //update single bill doc
-app.put('/users/:id/bills/:billId', (req, res) => {
+app.put('/users/:id/bills/:billId', passport.authenticate('jwt', { session: false }), (req, res) => {
   Bills.findByIdAndUpdate({ _id: req.params.billId }, {
     $set:
     {
@@ -231,7 +234,7 @@ app.put('/users/:id/bills/:billId', (req, res) => {
 //DELETE requests
 
 //delete user account
-app.delete('/users/:id', (req, res) => {
+app.delete('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findByIdAndRemove(req.params.id)
     .then((user) => {
       if (!user) {
@@ -247,7 +250,7 @@ app.delete('/users/:id', (req, res) => {
 });
 
 //delete expense by id
-app.delete('/expenses/:expenseId', (req, res) => {
+app.delete('/expenses/:expenseId', passport.authenticate('jwt', { session: false }), (req, res) => {
   Expenses.findByIdAndRemove({ _id: req.params.expenseId })
     .then((expense) => {
       if (!expense) {
@@ -263,7 +266,7 @@ app.delete('/expenses/:expenseId', (req, res) => {
 });
 
 //delete bill by id
-app.delete('/bills/:billId', (req, res) => {
+app.delete('/bills/:billId', passport.authenticate('jwt', { session: false }), (req, res) => {
   Bills.findByIdAndRemove({ _id: req.params.billId })
     .then((bill) => {
       if (!bill) {
