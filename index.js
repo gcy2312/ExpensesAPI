@@ -1,4 +1,5 @@
 const express = require("express");
+const { check, validationResult } = require('express-validator');
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const uuid = require('uuid');
@@ -21,6 +22,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 require('./passport');
 const passport = require('passport');
+
+const cors = require('cors');
+app.use(cors());
 
 const generateAuth = require('./auth');
 generateAuth(app);
@@ -104,33 +108,46 @@ app.get('/bills/:billId', passport.authenticate('jwt', { session: false }), (req
 //POST requests (create)
 
 //regsiter new user
-app.post('/users', (req, res) => {
-  Users.findOne({ Email: req.body.Email })
-    .then((user) => {
-      if (user) {
-        return res.status(400).send(req.body.Email + 'is already registered');
-      } else {
-        Users
-          .create({
-            FirstName: req.body.FirstName,
-            LastName: req.body.LastName,
-            Username: req.body.Username,
-            Password: req.body.Password,
-            Email: req.body.Email,
-            CurrencyPref: req.body.CurrencyPref
-          })
-          .then((user) => { res.status(201).json(user) })
-          .catch((error) => {
-            console.error(error);
-            res.status(500).send('Error: ' + error);
-          })
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error: ' + error);
-    });
-});
+app.post('/users',
+  [
+    check('Username', 'Username is required').not().isEmpty(),
+    check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be valid').isEmail(),
+    check('CurrencyPreef', 'Please select a currency preference').not().isEmpty(),
+  ], (req, res) => {
+    let errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    let hashedPassword = Users.hashPassword(req.body.Password);
+    Users.findOne({ Email: req.body.Email })
+      .then((user) => {
+        if (user) {
+          return res.status(400).send(req.body.Email + 'is already registered');
+        } else {
+          Users
+            .create({
+              FirstName: req.body.FirstName,
+              LastName: req.body.LastName,
+              Username: req.body.Username,
+              Password: hashedPassword,
+              Email: req.body.Email,
+              CurrencyPref: req.body.CurrencyPref
+            })
+            .then((user) => { res.status(201).json(user) })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).send('Error: ' + error);
+            })
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send('Error: ' + error);
+      });
+  });
 
 //create new expense doc
 app.post('/users/:id/expenses', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -294,6 +311,7 @@ app.delete('/bills/:billId', passport.authenticate('jwt', { session: false }), (
 
 
 // listen for requests
-app.listen(8080, () => {
-  console.log('Your app is listening on port 8080.');
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0', () => {
+  console.log('Listening on Port ' + port);
 });
