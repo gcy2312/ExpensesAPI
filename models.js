@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
 
 let billSchema = mongoose.Schema({
   Description: { type: String, required: true },
@@ -28,6 +30,15 @@ let userSchema = mongoose.Schema({
   CurrencyPref: { type: String, required: true },
   Email: { type: String, required: true },
 });
+
+userSchema.statics.hashPassword = (password) => {
+  return bcrypt.hashSync(password, 10);
+};
+
+userSchema.methods.validatePassword = function (password) {
+  //referring to the actual user document rather than userSchema.methods (this)
+  return bcrypt.compareSync(password, this.Password);
+};
 
 let Bill = mongoose.model('Bill', billSchema);
 let Expense = mongoose.model('Expense', expenseSchema);
