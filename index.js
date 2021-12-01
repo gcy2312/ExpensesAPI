@@ -191,7 +191,7 @@ app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, re
   Users.findByIdAndUpdate(req.params.id, {
     $set:
     {
-      FirstName: req.body.FistName,
+      FirstName: req.body.FirstName,
       LastName: req.body.LastName,
       Username: req.body.Username,
       Password: req.body.Password,
