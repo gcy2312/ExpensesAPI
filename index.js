@@ -188,13 +188,14 @@ app.post('/users/:id/bills', passport.authenticate('jwt', { session: false }), (
 
 //update user by id
 app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  let hashedPassword = Users.hashPassword(req.body.Password);
   Users.findByIdAndUpdate(req.params.id, {
     $set:
     {
       FirstName: req.body.FirstName,
       LastName: req.body.LastName,
       Username: req.body.Username,
-      Password: req.body.Password,
+      Password: hashedPassword,
       Email: req.body.Email,
       CurrencyPref: req.body.CurrencyPref
     }
