@@ -1,11 +1,16 @@
+const bodyParser = require("body-parser");
+const cors = require('cors');
 const express = require("express");
 const { check, validationResult } = require('express-validator');
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const uuid = require('uuid');
 const mongoose = require('mongoose');
+const morgan = require("morgan");
+
+const uuid = require('uuid');
+
 
 const Models = require('./models.js');
+require('./passport');
+const generateAuth = require('./auth');
 
 
 const Bills = Models.Bill;
@@ -17,19 +22,15 @@ const Users = Models.User;
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const app = express();
-app.use(morgan('common'));
-app.use(express.static('public'));
+app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('common'));
 
-require('./passport');
+generateAuth(app);
 const passport = require('passport');
 
-const cors = require('cors');
-app.use(cors());
 
-const generateAuth = require('./auth');
-generateAuth(app);
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
@@ -313,6 +314,12 @@ app.delete('/bills/:billId', passport.authenticate('jwt', { session: false }), (
 
 
 
+app.use(express.static('public'));
+
+app.use((err, req, res, next) => {
+  console.log(err.stack);
+  res.status(500).send('Something broke!');
+});
 
 // listen for requests
 const port = process.env.PORT || 8080;
