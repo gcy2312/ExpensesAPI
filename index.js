@@ -190,26 +190,49 @@ app.post('/users/:id/bills', passport.authenticate('jwt', { session: false }), (
 //update user by id
 app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   let hashedPassword = Users.hashPassword(req.body.Password);
-  Users.findByIdAndUpdate(req.params.id, {
-    $set:
-    {
-      FirstName: req.body.FirstName,
-      LastName: req.body.LastName,
-      Username: req.body.Username,
-      Password: hashedPassword,
-      Email: req.body.Email,
-      CurrencyPref: req.body.CurrencyPref
-    }
-  },
-    { new: true }, // This line makes sure that the updated document is returned
-    (err, updatedUser) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Error: ' + err);
-      } else {
-        res.json(updatedUser);
+  if (req.body.Password !== undefined) {
+    Users.findByIdAndUpdate(req.params.id, {
+      $set:
+      {
+        FirstName: req.body.FirstName,
+        LastName: req.body.LastName,
+        Username: req.body.Username,
+        Password: hashedPassword,
+        Email: req.body.Email,
+        CurrencyPref: req.body.CurrencyPref
       }
-    });
+    },
+      { new: true }, // This line makes sure that the updated document is returned
+      (err, updatedUser) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Error: ' + err);
+        } else {
+          res.json(updatedUser);
+        }
+      });
+  } else {
+    Users.findByIdAndUpdate(req.params.id, {
+      $set:
+      {
+        FirstName: req.body.FirstName,
+        LastName: req.body.LastName,
+        Username: req.body.Username,
+
+        Email: req.body.Email,
+        CurrencyPref: req.body.CurrencyPref
+      }
+    },
+      { new: true }, // This line makes sure that the updated document is returned
+      (err, updatedUser) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Error: ' + err);
+        } else {
+          res.json(updatedUser);
+        }
+      });
+  }
 });
 
 //update single expense doc
