@@ -205,7 +205,7 @@ app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, re
       (err, updatedUser) => {
         if (err) {
           console.error(err);
-          res.status(500).send('Error: ' + err.error.message);
+          res.status(500).send('Error: ' + err.message);
         } else {
           res.json(updatedUser);
         }
@@ -226,7 +226,7 @@ app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, re
       (err, updatedUser) => {
         if (err) {
           console.error(err);
-          res.status(500).send('Error: ' + err.error.message);
+          res.status(500).send('Error: ' + err.message);
         } else {
           res.json(updatedUser);
         }
