@@ -190,14 +190,13 @@ app.post('/users/:id/bills', passport.authenticate('jwt', { session: false }), (
 //update user by id
 app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   let hashedPassword = Users.hashPassword(req.body.Password);
-  if (req.body.Password !== undefined && req.body.Password !== null) {
+  if (req.body.Password == undefined || req.body.Password == null) {
     Users.findByIdAndUpdate(req.params.id, {
       $set:
       {
         FirstName: req.body.FirstName,
         LastName: req.body.LastName,
         Username: req.body.Username,
-        Password: hashedPassword,
         Email: req.body.Email,
         CurrencyPref: req.body.CurrencyPref
       }
@@ -218,7 +217,7 @@ app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, re
         FirstName: req.body.FirstName,
         LastName: req.body.LastName,
         Username: req.body.Username,
-
+        Password: hashedPassword,
         Email: req.body.Email,
         CurrencyPref: req.body.CurrencyPref
       }
