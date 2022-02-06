@@ -197,7 +197,7 @@ app.put('/users/:id', passport.authenticate('jwt', { session: false }), (req, re
         FirstName: req.body.FirstName,
         LastName: req.body.LastName,
         Username: req.body.Username,
-        // Password: hashedPassword,
+
         Email: req.body.Email,
         CurrencyPref: req.body.CurrencyPref
       }
