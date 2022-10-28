@@ -1,6 +1,6 @@
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
 const cors = require('cors');
-const express = require("express");
+const express = require('express');
 const { check, validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 const morgan = require("morgan");
@@ -17,21 +17,14 @@ const Bills = Models.Bill;
 const Expenses = Models.Expense;
 const Users = Models.User;
 
-// mongoose.connect('mongodb://localhost:27017/billFoldDB', { useNewUrlParser: true, useUnifiedTopology: true });
-
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
 const app = express();
-// const corsOptions = {
-//   origin: '*',
-//   credentials: true,            //access-control-allow-credentials:true
-//   optionSuccessStatus: 200,
-// }
-
-// app.use(cors(corsOptions)) // Use this after the variable declaration
 app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan('common'));
+
+// mongoose.connect('mongodb://localhost:27017/billFoldDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 generateAuth(app);
 const passport = require('passport');
@@ -349,10 +342,10 @@ app.delete('/bills/:billId', passport.authenticate('jwt', { session: false }), (
 app.use(express.static('public'));
 
 app.use((err, req, res, next) => {
-  // res.header("Access-Control-Allow-Origin", "*");
-  // res.header("Access-Control-Allow-Methods", "GET , PUT , POST , DELETE");
-  // res.header("Access-Control-Allow-Headers", "Content-Type, x-requested-with");
-  // next(); // Important
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET , PUT , POST , DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type, x-requested-with");
+  next(); // Important
   console.log(err.stack);
   res.status(500).send('Something broke!');
 });
