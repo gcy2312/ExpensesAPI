@@ -342,10 +342,6 @@ app.delete('/bills/:billId', passport.authenticate('jwt', { session: false }), (
 app.use(express.static('public'));
 
 app.use((err, req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET , PUT , POST , DELETE");
-  res.header("Access-Control-Allow-Headers", "Content-Type, x-requested-with");
-  next(); // Important
   console.log(err.stack);
   res.status(500).send('Something broke!');
 });
